@@ -41,7 +41,30 @@ pip install pytest pytest-cov
 
 ## Usage
 
-### Running the Application
+### Interactive Mode (Recommended)
+
+Run the app in interactive menu mode where tasks persist throughout your session:
+
+```bash
+python -m src.cli.main -i
+# OR
+python -m src.cli.main --interactive
+```
+
+This will show a menu where you can:
+1. Add task
+2. List tasks
+3. Mark task as done
+4. Mark task as undone
+5. Update task
+6. Delete task
+7. Exit
+
+**Note:** Tasks persist during the interactive session and are lost when you exit.
+
+### Command-Line Mode
+
+You can also run individual commands (tasks will NOT persist between commands):
 
 ```bash
 # Using module invocation (recommended)
@@ -99,20 +122,48 @@ python -m src.cli.main --help
 python -m src.cli.main add --help
 ```
 
-## Example Session
+## Example Session (Interactive Mode)
 
 ```bash
-$ python -m src.cli.main add "Buy groceries" -d "Milk, eggs, bread"
+$ python -m src.cli.main -i
+
+==================================================
+TODO APP - INTERACTIVE MODE
+==================================================
+1. Add task
+2. List tasks
+3. Mark task as done
+4. Mark task as undone
+5. Update task
+6. Delete task
+7. Exit
+==================================================
+
+Select an option (1-7): 1
+Enter task title: Buy groceries
+Enter task description (optional): Milk, eggs, bread
 Task #1 created successfully
   Title: Buy groceries
   Status: pending
 
-$ python -m src.cli.main add "Call dentist"
+==================================================
+TODO APP - INTERACTIVE MODE
+==================================================
+...
+
+Select an option (1-7): 1
+Enter task title: Call dentist
+Enter task description (optional):
 Task #2 created successfully
   Title: Call dentist
   Status: pending
 
-$ python -m src.cli.main list
+==================================================
+TODO APP - INTERACTIVE MODE
+==================================================
+...
+
+Select an option (1-7): 2
 Tasks (2 total):
 
 [1] [ ] Buy groceries
@@ -123,10 +174,21 @@ Tasks (2 total):
 
 Legend: [ ] pending, [x] complete
 
-$ python -m src.cli.main done 1
+==================================================
+TODO APP - INTERACTIVE MODE
+==================================================
+...
+
+Select an option (1-7): 3
+Enter task ID to mark as done: 1
 Task #1 marked as complete
 
-$ python -m src.cli.main list
+==================================================
+TODO APP - INTERACTIVE MODE
+==================================================
+...
+
+Select an option (1-7): 2
 Tasks (2 total):
 
 [1] [x] Buy groceries
@@ -136,6 +198,15 @@ Tasks (2 total):
     (no description)
 
 Legend: [ ] pending, [x] complete
+
+==================================================
+TODO APP - INTERACTIVE MODE
+==================================================
+...
+
+Select an option (1-7): 7
+
+Goodbye!
 ```
 
 ## Running Tests
@@ -188,7 +259,10 @@ todoapp/
 
 ## Important Notes
 
-- **Data is NOT persisted**: All tasks are stored in memory and will be lost when the application exits. This is by design for Phase I.
+- **Interactive Mode vs Command Mode**:
+  - **Interactive Mode** (`-i` flag): Tasks persist throughout the session until you exit. Best for normal use.
+  - **Command Mode**: Each command runs independently - tasks do NOT persist between commands.
+- **Data is NOT persisted to disk**: All tasks are stored in memory and will be lost when the application exits. This is by design for Phase I.
 - **Single-user**: The application is designed for single-user use.
 - **No network required**: Works completely offline.
 

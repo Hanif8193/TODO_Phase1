@@ -78,6 +78,99 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def interactive_mode() -> int:
+    """Run the app in interactive menu mode.
+
+    Tasks persist throughout the session until the user exits.
+
+    Returns:
+        Exit code (0 for success).
+    """
+    service = get_service()
+
+    while True:
+        print("\n" + "="*50)
+        print("TODO APP - INTERACTIVE MODE")
+        print("="*50)
+        print("1. Add task")
+        print("2. List tasks")
+        print("3. Mark task as done")
+        print("4. Mark task as undone")
+        print("5. Update task")
+        print("6. Delete task")
+        print("7. Exit")
+        print("="*50)
+
+        choice = input("\nSelect an option (1-7): ").strip()
+
+        try:
+            if choice == "1":
+                title = input("Enter task title: ").strip()
+                if not title:
+                    print("Error: Title cannot be empty")
+                    continue
+                description = input("Enter task description (optional): ").strip()
+                handle_add(service, title, description)
+
+            elif choice == "2":
+                handle_list(service)
+
+            elif choice == "3":
+                task_id = input("Enter task ID to mark as done: ").strip()
+                try:
+                    handle_done(service, int(task_id))
+                except ValueError:
+                    print("Error: Invalid task ID. Must be a number.")
+
+            elif choice == "4":
+                task_id = input("Enter task ID to mark as undone: ").strip()
+                try:
+                    handle_undone(service, int(task_id))
+                except ValueError:
+                    print("Error: Invalid task ID. Must be a number.")
+
+            elif choice == "5":
+                task_id = input("Enter task ID to update: ").strip()
+                try:
+                    task_id = int(task_id)
+                    print("Leave blank to keep current value")
+                    title = input("Enter new title (optional): ").strip()
+                    description = input("Enter new description (optional): ").strip()
+
+                    if not title and not description:
+                        print("Error: At least one field must be provided")
+                        continue
+
+                    handle_update(
+                        service,
+                        task_id,
+                        title=title if title else None,
+                        description=description if description else None
+                    )
+                except ValueError:
+                    print("Error: Invalid task ID. Must be a number.")
+
+            elif choice == "6":
+                task_id = input("Enter task ID to delete: ").strip()
+                try:
+                    handle_delete(service, int(task_id))
+                except ValueError:
+                    print("Error: Invalid task ID. Must be a number.")
+
+            elif choice == "7":
+                print("\nGoodbye!")
+                return 0
+
+            else:
+                print("Error: Invalid option. Please select 1-7.")
+
+        except KeyboardInterrupt:
+            print("\n\nGoodbye!")
+            return 0
+        except Exception as e:
+            print(f"Error: {e}", file=sys.stderr)
+
+
 def main(args: list[str] | None = None) -> int:
     """Main entry point for the CLI.
 
@@ -88,7 +181,19 @@ def main(args: list[str] | None = None) -> int:
         Exit code (0 for success, 1 for user error, 2 for system error).
     """
     parser = create_parser()
+
+    # Add interactive mode flag
+    parser.add_argument(
+        "-i", "--interactive",
+        action="store_true",
+        help="Run in interactive mode with persistent session"
+    )
+
     parsed_args = parser.parse_args(args)
+
+    # Check for interactive mode first
+    if parsed_args.interactive:
+        return interactive_mode()
 
     if parsed_args.command is None:
         parser.print_help()
